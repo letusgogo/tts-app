@@ -24,8 +24,7 @@ export default function SentenceBlock({
   pitch, onPitchChange, speed, onSpeedChange, loading, onKeyDown, audioUrl
 }: Props) {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
-  const [focused, setFocused] = useState(false)
-  const blurTimeout = useRef<NodeJS.Timeout | null>(null)
+  const [showActions, setShowActions] = useState(false)
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -34,13 +33,16 @@ export default function SentenceBlock({
   }, [])
 
   return (
-    <div className="flex flex-col gap-1">
-      {/* 按钮组：仅聚焦时显示 */}
-      {focused && (
+    <div
+      className="flex flex-col gap-1"
+      onMouseEnter={() => setShowActions(true)}
+      onMouseLeave={() => setShowActions(false)}
+    >
+      {/* 只在编辑或悬停时显示按钮 */}
+      {showActions && (
         <div className="flex items-center gap-2 mb-1">
           <Button
             size="sm"
-            onMouseDown={e => e.preventDefault()}
             onClick={onGenerate}
             disabled={loading}
           >
@@ -72,13 +74,8 @@ export default function SentenceBlock({
         value={value}
         onChange={e => onChange(e.target.value)}
         onKeyDown={onKeyDown}
-        onFocus={() => {
-          if (blurTimeout.current) clearTimeout(blurTimeout.current)
-          setFocused(true)
-        }}
-        onBlur={() => {
-          blurTimeout.current = setTimeout(() => setFocused(false), 100)
-        }}
+        onFocus={() => setShowActions(true)}
+        onBlur={() => setShowActions(false)}
       />
       {/* audio 播放器 */}
       {audioUrl && (

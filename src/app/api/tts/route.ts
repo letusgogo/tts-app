@@ -4,7 +4,7 @@ export async function POST(request: Request) {
     // 解析请求体
     const { text, voice } = await request.json();
 
-    // 你的火山引擎参数
+    // 火山引擎参数
     const APPID = process.env.VOLC_TTS_APPID!;
     const TOKEN = process.env.VOLC_TTS_TOKEN!;
     const CLUSTER = process.env.VOLC_TTS_CLUSTER!;
