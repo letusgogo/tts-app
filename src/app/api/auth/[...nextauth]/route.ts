@@ -7,7 +7,7 @@ declare module "next-auth" {
             name?: string | null;
             email?: string | null;
             image?: string | null;
-            score?: number; // 你的自定义字段
+            leftTime?: number;
         };
     }
     interface Profile {
@@ -18,7 +18,7 @@ declare module "next-auth" {
 declare module "next-auth/jwt" {
     interface JWT {
         id?: string;
-        score?: number;
+        leftTime?: number;
     }
 }
 
@@ -37,15 +37,16 @@ export const authOptions: NextAuthOptions = {
     callbacks: {
         async session({ session, token }) {
             if (session.user) {
-                session.user.score = token.score;
+                session.user.leftTime = token.leftTime;
             }
             return session;
         },
         async jwt({ token, account, profile }) {
             if (account && profile) {
                 token.id = profile.sub   // 用户唯一标识
-                token.score = profile.score;
+                token.leftTime = profile.score;
             }
+            console.debug('token:', token)
             return token;
         },
     },

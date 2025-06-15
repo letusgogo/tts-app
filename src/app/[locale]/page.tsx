@@ -6,6 +6,7 @@ import VoiceBlock from "@/components/VoiceBlock"
 import React from "react"
 import { useImmerReducer } from "use-immer"
 import { useSession, signIn, signOut } from "next-auth/react"
+import { useTranslations } from 'next-intl';
 
 type VoiceBlockData = { id: string; voice: string }
 type Action =
@@ -35,6 +36,7 @@ function reducer(draft: VoiceBlockData[], action: Action): VoiceBlockData[] | vo
 export default function Home() {
   const { data: session } = useSession()
   const [blocks, dispatch] = useImmerReducer(reducer, [voiceBlockInitial()])
+  const t = useTranslations();
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-8 relative">
@@ -43,10 +45,10 @@ export default function Home() {
         {session ? (
           <div className="flex items-center gap-2">
             <span>Hi, {session.user?.name || session.user?.email}</span>
-            <button className="px-3 py-1 bg-gray-200 rounded" onClick={() => signOut()}>登出</button>
+            <button className="px-3 py-1 bg-gray-200 rounded" onClick={() => signOut()}>{t('logout')}</button>
           </div>
         ) : (
-          <button className="px-3 py-1 bg-blue-600 text-white rounded" onClick={() => signIn("casdoor")}>登录</button>
+          <button className="px-3 py-1 bg-blue-600 text-white rounded" onClick={() => signIn("casdoor")}>{t('login')}</button>
         )}
       </div>
       <div className="space-y-6 w-full max-w-2xl bg-white p-6 rounded shadow">

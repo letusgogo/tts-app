@@ -19,7 +19,7 @@ export default function UserInfo() {
 
     return (
         <div className="flex items-center gap-2">
-            <span>Hi, name: {session.user?.name}, email: {session.user?.email}, score: {session.user?.score}</span>
+            <span>Hi, name: {session.user?.name}, email: {session.user?.email}, leftTime: {session.user?.leftTime}</span>
             <button className="px-3 py-1 bg-gray-200 rounded" onClick={() => signOut()}>登出</button>
         </div>
     );

@@ -36,7 +36,49 @@ type Action =
     | { type: "SET_SENTENCE_SPEED"; id: string; speed: string }
     | { type: "INSERT_SENTENCE_AFTER"; id: string }
 
-const voices = ["BV421_streaming", "BV702_streaming", "BV700_streaming", "BV503_streaming"]
+
+
+
+type Voice = {
+    id: string
+    name: string
+    englishName: string
+    description: string
+}
+
+type VoiceGroup = {
+    name: string
+    englishName: string
+    voices: Voice[]
+}
+
+const voiceGroups: VoiceGroup[] = [
+    {
+        name: "美式英语", englishName: "en-US", voices: [
+            { id: "BV511_streaming", name: "慵懒女声-Ava", englishName: "Ava", description: "【7种情感】通用、开心、悲伤、生气、害怕、厌恶、惊讶" },
+            { id: "BV505_streaming", name: "议校女声-Alicia", englishName: "Alicia", description: "" },
+            { id: "BV138_streaming", name: "情感女声-Lawrence", englishName: "Lawrence", description: "【8种情感】旁白、平和、开心、悲伤、生气、害怕、厌恶、惊讶" },
+            { id: "BV027_streaming", name: "美式女声-Amelia", englishName: "Amelia", description: "" },
+            { id: "BV502_streaming", name: "讲述女声-Amanda", englishName: "Amanda", description: "" },
+            { id: "BV503_streaming", name: "活力女声-Ariana", englishName: "Ariana", description: "" },
+            { id: "BV504_streaming", name: "活力男声-Jackson", englishName: "Jackson", description: "" },
+            { id: "BV421_streaming", name: "天才少女", englishName: "Candy2.0", description: "【8国】中文、英语、日语、葡语、西语、印尼语、越南语、泰语" },
+            { id: "BV702_streaming", name: "Stefan", englishName: "Stefan", description: "【8国】中文、英语、日语、葡语、西语、印尼语、越南语" },
+            { id: "BV506_streaming", name: "天真萌娃-Lily", englishName: "Lily", description: "" },
+        ]
+    },
+    {
+        name: "英式英语", englishName: "en-GB", voices: [
+            { id: "BV040_streaming", name: "亲切女声-Anna", englishName: "Anna", description: "【7种情感】通用、开心、悲伤、生气、害怕、厌恶、惊讶" },
+        ]
+    },
+    {
+        name: "澳洲英语", englishName: "en-AU", voices: [
+            { id: "BV516_streaming", name: "澳洲男声-Henry", englishName: "Henry", description: "" },
+            { id: "BV520_streaming", name: "元气少女", englishName: "元气少女", description: "" },
+        ]
+    }
+]
 
 const initialState = (voice: string): State => ({
     role: voice,
@@ -136,8 +178,8 @@ export default function VoiceBlock({ id, voice }: Props) {
                         <SelectValue placeholder="选择声音" />
                     </SelectTrigger>
                     <SelectContent>
-                        {voices.map(v => (
-                            <SelectItem key={v} value={v}>{v}</SelectItem>
+                        {voiceGroups.map(v => (
+                            <SelectItem key={v.id} value={v.id}>{v.name}-{v.description}</SelectItem>
                         ))}
                     </SelectContent>
                 </Select>

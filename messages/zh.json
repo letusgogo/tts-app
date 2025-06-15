@@ -1,0 +1,11 @@
+{
+    "hello": "你好",
+    "login": "登录",
+    "logout": "登出",
+    "tts_title": "文本转语音 (TTS)",
+    "add_voice_block": "添加 VoiceBlock",
+    "delete": "删除",
+    "generate_audio": "生成语音",
+    "pitch": "语调",
+    "speed": "语速"
+}
