@@ -3,9 +3,9 @@
 import { useImmerReducer } from "use-immer"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 import SentenceBlock from "./SentenceBlock"
+import { useTranslations } from 'next-intl'
 
 export type Props = {
-    id: string
     voice: string
 }
 
@@ -36,49 +36,16 @@ type Action =
     | { type: "SET_SENTENCE_SPEED"; id: string; speed: string }
     | { type: "INSERT_SENTENCE_AFTER"; id: string }
 
-
-
-
-type Voice = {
-    id: string
-    name: string
-    englishName: string
-    description: string
-}
-
 type VoiceGroup = {
     name: string
     englishName: string
-    voices: Voice[]
-}
-
-const voiceGroups: VoiceGroup[] = [
-    {
-        name: "美式英语", englishName: "en-US", voices: [
-            { id: "BV511_streaming", name: "慵懒女声-Ava", englishName: "Ava", description: "【7种情感】通用、开心、悲伤、生气、害怕、厌恶、惊讶" },
-            { id: "BV505_streaming", name: "议校女声-Alicia", englishName: "Alicia", description: "" },
-            { id: "BV138_streaming", name: "情感女声-Lawrence", englishName: "Lawrence", description: "【8种情感】旁白、平和、开心、悲伤、生气、害怕、厌恶、惊讶" },
-            { id: "BV027_streaming", name: "美式女声-Amelia", englishName: "Amelia", description: "" },
-            { id: "BV502_streaming", name: "讲述女声-Amanda", englishName: "Amanda", description: "" },
-            { id: "BV503_streaming", name: "活力女声-Ariana", englishName: "Ariana", description: "" },
-            { id: "BV504_streaming", name: "活力男声-Jackson", englishName: "Jackson", description: "" },
-            { id: "BV421_streaming", name: "天才少女", englishName: "Candy2.0", description: "【8国】中文、英语、日语、葡语、西语、印尼语、越南语、泰语" },
-            { id: "BV702_streaming", name: "Stefan", englishName: "Stefan", description: "【8国】中文、英语、日语、葡语、西语、印尼语、越南语" },
-            { id: "BV506_streaming", name: "天真萌娃-Lily", englishName: "Lily", description: "" },
-        ]
-    },
-    {
-        name: "英式英语", englishName: "en-GB", voices: [
-            { id: "BV040_streaming", name: "亲切女声-Anna", englishName: "Anna", description: "【7种情感】通用、开心、悲伤、生气、害怕、厌恶、惊讶" },
-        ]
-    },
-    {
-        name: "澳洲英语", englishName: "en-AU", voices: [
-            { id: "BV516_streaming", name: "澳洲男声-Henry", englishName: "Henry", description: "" },
-            { id: "BV520_streaming", name: "元气少女", englishName: "元气少女", description: "" },
-        ]
+    voices: {
+        [key: string]: {
+            name: string
+            description: string
+        }
     }
-]
+}
 
 const initialState = (voice: string): State => ({
     role: voice,
@@ -150,18 +117,24 @@ function reducer(draft: State, action: Action): void {
     }
 }
 
-export default function VoiceBlock({ id, voice }: Props) {
+export default function VoiceBlock({ voice }: Props) {
     const [state, dispatch] = useImmerReducer(reducer, initialState(voice))
+    const t = useTranslations('VoiceBlock')
 
     async function handleGenerate(sid: string, text: string) {
         dispatch({ type: "SET_SENTENCE_LOADING", id: sid, loading: true })
         try {
+            if (text.trim() === "") {
+                dispatch({ type: "SET_SENTENCE_ERROR", id: sid, error: "text is empty" })
+                return
+            }
+
             const res = await fetch("/api/tts", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ text, voice: state.role }),
             })
-            if (!res.ok) throw new Error("生成失败")
+            if (!res.ok) throw new Error("generate tts failed")
             const data = await res.json()
             dispatch({ type: "SET_SENTENCE_AUDIO", id: sid, audioUrl: data.audioUrl })
         } catch (e: unknown) {
@@ -172,14 +145,18 @@ export default function VoiceBlock({ id, voice }: Props) {
     return (
         <div className="border rounded p-4 bg-gray-50 space-y-3">
             <div className="flex items-center gap-2">
-                <span className="font-semibold">角色:</span>
+                <span className="font-semibold">{t('role')}:</span>
                 <Select value={state.role} onValueChange={(v) => dispatch({ type: "SET_ROLE", payload: v })}>
                     <SelectTrigger className="w-32">
-                        <SelectValue placeholder="选择声音" />
+                        <SelectValue placeholder={t('selectVoice')} />
                     </SelectTrigger>
                     <SelectContent>
-                        {voiceGroups.map(v => (
-                            <SelectItem key={v.id} value={v.id}>{v.name}-{v.description}</SelectItem>
+                        {Object.entries(t.raw('voiceGroups')).map(([_, group]) => (
+                            Object.entries((group as VoiceGroup).voices).map(([voiceId, voice]) => (
+                                <SelectItem key={voiceId} value={voiceId}>
+                                    {voice.name}{voice.description ? ` - ${voice.description}` : ''}
+                                </SelectItem>
+                            ))
                         ))}
                     </SelectContent>
                 </Select>

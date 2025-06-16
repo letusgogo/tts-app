@@ -7,5 +7,95 @@
     "delete": "删除",
     "generate_audio": "生成语音",
     "pitch": "语调",
-    "speed": "语速"
+    "speed": "语速",
+    "VoiceBlock": {
+        "role": "角色",
+        "selectVoice": "选择声音",
+        "voiceGroups": {
+            "en-US": {
+                "name": "美式英语",
+                "voices": {
+                    "BV511_streaming": {
+                        "name": "慵懒女声-Ava",
+                        "description": "【7种情感】通用、开心、悲伤、生气、害怕、厌恶、惊讶"
+                    },
+                    "BV505_streaming": {
+                        "name": "议校女声-Alicia",
+                        "description": ""
+                    },
+                    "BV138_streaming": {
+                        "name": "情感女声-Lawrence",
+                        "description": "【8种情感】旁白、平和、开心、悲伤、生气、害怕、厌恶、惊讶"
+                    },
+                    "BV027_streaming": {
+                        "name": "美式女声-Amelia",
+                        "description": ""
+                    },
+                    "BV502_streaming": {
+                        "name": "讲述女声-Amanda",
+                        "description": ""
+                    },
+                    "BV503_streaming": {
+                        "name": "活力女声-Ariana",
+                        "description": ""
+                    },
+                    "BV504_streaming": {
+                        "name": "活力男声-Jackson",
+                        "description": ""
+                    },
+                    "BV421_streaming": {
+                        "name": "天才少女",
+                        "description": "【8国】中文、英语、日语、葡语、西语、印尼语、越南语、泰语"
+                    },
+                    "BV702_streaming": {
+                        "name": "Stefan",
+                        "description": "【8国】中文、英语、日语、葡语、西语、印尼语、越南语"
+                    },
+                    "BV506_streaming": {
+                        "name": "天真萌娃-Lily",
+                        "description": ""
+                    }
+                }
+            },
+            "en-GB": {
+                "name": "英式英语",
+                "voices": {
+                    "BV040_streaming": {
+                        "name": "亲切女声-Anna",
+                        "description": "【7种情感】通用、开心、悲伤、生气、害怕、厌恶、惊讶"
+                    }
+                }
+            },
+            "en-AU": {
+                "name": "澳洲英语",
+                "voices": {
+                    "BV516_streaming": {
+                        "name": "澳洲男声-Henry",
+                        "description": ""
+                    },
+                    "BV520_streaming": {
+                        "name": "元气少女",
+                        "description": ""
+                    }
+                }
+            }
+        }
+    },
+    "SentenceBlock": {
+        "generate": "生成语音",
+        "generating": "生成中...",
+        "pitch": {
+            "label": "语调",
+            "low": "低",
+            "normal": "正常",
+            "high": "高"
+        },
+        "speed": {
+            "label": "语速",
+            "slow": "慢",
+            "normal": "正常",
+            "fast": "快"
+        },
+        "delete": "删除"
+    }
 }

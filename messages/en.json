@@ -7,5 +7,96 @@
     "delete": "Delete",
     "generate_audio": "Generate Audio",
     "pitch": "Pitch",
-    "speed": "Speed"
+    "speed": "Speed",
+
+    "VoiceBlock": {
+        "role": "Role",
+        "selectVoice": "Select Voice",
+        "voiceGroups": {
+            "en-US": {
+                "name": "American English",
+                "voices": {
+                    "BV511_streaming": {
+                        "name": "Lazy Female-Ava",
+                        "description": "【7 emotions】General, Happy, Sad, Angry, Fear, Disgust, Surprise"
+                    },
+                    "BV505_streaming": {
+                        "name": "Professional Female-Alicia",
+                        "description": ""
+                    },
+                    "BV138_streaming": {
+                        "name": "Emotional Female-Lawrence",
+                        "description": "【8 emotions】Narration, Calm, Happy, Sad, Angry, Fear, Disgust, Surprise"
+                    },
+                    "BV027_streaming": {
+                        "name": "American Female-Amelia",
+                        "description": ""
+                    },
+                    "BV502_streaming": {
+                        "name": "Narrative Female-Amanda",
+                        "description": ""
+                    },
+                    "BV503_streaming": {
+                        "name": "Energetic Female-Ariana",
+                        "description": ""
+                    },
+                    "BV504_streaming": {
+                        "name": "Energetic Male-Jackson",
+                        "description": ""
+                    },
+                    "BV421_streaming": {
+                        "name": "Genius Girl",
+                        "description": "【8 languages】Chinese, English, Japanese, Portuguese, Spanish, Indonesian, Vietnamese, Thai"
+                    },
+                    "BV702_streaming": {
+                        "name": "Stefan",
+                        "description": "【7 languages】Chinese, English, Japanese, Portuguese, Spanish, Indonesian, Vietnamese"
+                    },
+                    "BV506_streaming": {
+                        "name": "Cute Child-Lily",
+                        "description": ""
+                    }
+                }
+            },
+            "en-GB": {
+                "name": "British English",
+                "voices": {
+                    "BV040_streaming": {
+                        "name": "Friendly Female-Anna",
+                        "description": "【7 emotions】General, Happy, Sad, Angry, Fear, Disgust, Surprise"
+                    }
+                }
+            },
+            "en-AU": {
+                "name": "Australian English",
+                "voices": {
+                    "BV516_streaming": {
+                        "name": "Australian Male-Henry",
+                        "description": ""
+                    },
+                    "BV520_streaming": {
+                        "name": "Energetic Girl",
+                        "description": ""
+                    }
+                }
+            }
+        }
+    },
+    "SentenceBlock": {
+        "generate": "Generate Audio",
+        "generating": "Generating...",
+        "pitch": {
+            "label": "Pitch",
+            "low": "Low",
+            "normal": "Normal",
+            "high": "High"
+        },
+        "speed": {
+            "label": "Speed",
+            "slow": "Slow",
+            "normal": "Normal",
+            "fast": "Fast"
+        },
+        "delete": "Delete"
+    }
 }
