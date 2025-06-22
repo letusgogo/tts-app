@@ -3,12 +3,11 @@
     "login": "Login",
     "logout": "Logout",
     "tts_title": "Text to Speech (TTS)",
-    "add_voice_block": "Add VoiceBlock",
+    "add_voice_block": "Add Block",
     "delete": "Delete",
     "generate_audio": "Generate Audio",
     "pitch": "Pitch",
     "speed": "Speed",
-
     "VoiceBlock": {
         "role": "Role",
         "selectVoice": "Select Voice",

@@ -77,12 +77,12 @@ interface Props {
   onSpeedChange: (val: string) => void;
   loading?: boolean;
   onKeyDown?: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
+  onSynthesisRequest?: () => Promise<void>;
 }
 
 export default function SentenceBlock({
   value, onChange, onGenerate, onDelete,
-  pitch, onPitchChange, speed, onSpeedChange, loading, onKeyDown, audioUrl
-}: Props) {
+  pitch, onPitchChange, speed, onSpeedChange, loading, onKeyDown, audioUrl }: Props) {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [showFunctions, setShowFunctions] = useState(false)
   const hideTimer = useRef<NodeJS.Timeout | null>(null)

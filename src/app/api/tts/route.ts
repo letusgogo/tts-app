@@ -1,6 +1,20 @@
+// import { writeFileSync } from 'fs';
+import { readFileSync } from 'fs';
 import { NextResponse } from 'next/server';
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 export async function POST(request: Request) {
+    // 直接检查认证
+    const session = await getServerSession(authOptions);
+
+    if (!session || !session.user) {
+        return NextResponse.json(
+            { error: "Authentication required" },
+            { status: 401 }
+        );
+    }
+
     // 解析请求体
     const { text, voice } = await request.json();
 
@@ -9,6 +23,7 @@ export async function POST(request: Request) {
     const TOKEN = process.env.VOLC_TTS_TOKEN!;
     const CLUSTER = process.env.VOLC_TTS_CLUSTER!;
     const UID = process.env.VOLC_TTS_UID!;
+    const MOCK = process.env.VOLC_TTS_MOCK!;
 
     // 构造请求体
     const volcReqBody = {
@@ -42,15 +57,29 @@ export async function POST(request: Request) {
         }
     };
 
-    // 请求火山引擎 TTS
-    const volcRes = await fetch('https://openspeech.bytedance.com/api/v1/tts', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer;${TOKEN}`,
-        },
-        body: JSON.stringify(volcReqBody),
-    });
+    let volcRes: Response;
+    let mockResult: string;
+    if (MOCK === 'true') {
+        await new Promise(resolve => setTimeout(resolve, 3000));
+        mockResult = readFileSync('src/app/api/tts/mock/volcData.json', 'utf-8');
+        volcRes = new Response(mockResult, {
+            status: 200,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+    } else {
+        // 请求火山引擎 TTS
+        volcRes = await fetch('https://openspeech.bytedance.com/api/v1/tts', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer;${TOKEN}`,
+            },
+            body: JSON.stringify(volcReqBody),
+        });
+    }
+
 
     const volcData = await volcRes.json();
 
@@ -59,9 +88,11 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: volcData.message || 'TTS 服务调用失败' }, { status: 500 });
     }
 
-    console.log(volcData);
+    // 写到文件
+    // writeFileSync('src/app/api/tts/volcData.json', JSON.stringify(volcData, null, 2));
 
     // 返回 base64 音频
     const audioUrl = `data:audio/mp3;base64,${volcData.data}`;
     return NextResponse.json({ audioUrl });
-} 
+}
+
