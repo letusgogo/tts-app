@@ -30,10 +30,13 @@ export const authOptions: NextAuthOptions = {
             clientId: process.env.CASDOOR_CLIENT_ID!,
             clientSecret: process.env.CASDOOR_CLIENT_SECRET!,
             issuer: process.env.CASDOOR_ISSUER!,
-            wellKnown: process.env.CASDOOR_WELL_KNOWN, // 推荐直接用 well-known 地址
+            wellKnown: process.env.CASDOOR_WELL_KNOWN,
             authorization: { params: { scope: "openid profile email" } },
         }),
     ],
+    session: {
+        strategy: "jwt",
+    },
     callbacks: {
         async session({ session, token }) {
             if (session.user) {
@@ -43,10 +46,9 @@ export const authOptions: NextAuthOptions = {
         },
         async jwt({ token, account, profile }) {
             if (account && profile) {
-                token.id = profile.sub   // 用户唯一标识
+                token.id = profile.sub
                 token.leftTime = profile.score;
             }
-            console.debug('token:', token)
             return token;
         },
     },

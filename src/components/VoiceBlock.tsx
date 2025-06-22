@@ -268,13 +268,11 @@ export default function VoiceBlock({ voice, ref }: Props) {
             {state.synthesisError && (
                 <div className="text-red-600">合成错误: {state.synthesisError}</div>
             )}
-            {state.synthesisUrl && (
-                <div className="text-green-600">
-                    <audio controls className="mt-2">
-                        <source src={state.synthesisUrl} type="audio/mp3" />
-                    </audio>
-                </div>
-            )}
+            {/* {state.synthesisUrl && (
+                <audio controls className="mt-2 w-full">
+                    <source src={state.synthesisUrl} type="audio/mp3" />
+                </audio>
+            )} */}
 
             {/* 句子列表 */}
             {state.sentences.map((s: Sentence) => (

@@ -143,34 +143,13 @@ export default function Home() {
         </div>
 
         {/* Merge Audio Button */}
-        <div className="flex justify-center gap-4">
+        <div className="flex justify-center">
           <Button
             onClick={handleMergeAudio}
             disabled={isMerging || blocks.length === 0}
             className="bg-green-600 hover:bg-green-700"
           >
             {isMerging ? "正在合并音频..." : "合并音频"}
-          </Button>
-
-          {/* Test Authentication Button */}
-          <Button
-            onClick={async () => {
-              try {
-                const res = await fetch("/api/test-auth")
-                const data = await res.json()
-                if (res.ok) {
-                  alert(`认证成功! 用户: ${data.user?.name || data.user?.email}`)
-                } else {
-                  alert(`认证失败: ${data.error}`)
-                }
-              } catch (error) {
-                alert(`测试失败: ${error}`)
-              }
-            }}
-            variant="outline"
-            className="border-blue-500 text-blue-600 hover:bg-blue-50"
-          >
-            测试认证
           </Button>
         </div>
 
