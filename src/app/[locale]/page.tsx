@@ -13,7 +13,7 @@ type Action =
   | { type: "ADD_BLOCK" }
   | { type: "REMOVE_BLOCK"; id: string }
 
-function voiceBlockInitial(voice = "BV421_streaming"): VoiceBlockData {
+function voiceBlockInitial(voice = "BV511_streaming"): VoiceBlockData {
   return {
     id: crypto.randomUUID(),
     voice
