@@ -65,7 +65,7 @@ export default function VoiceBlock({ voice, sentences, synthesisError, onChange,
         });
     }
     const handleAddSentence = () => {
-        onChange({ sentences: [...sentences, { id: crypto.randomUUID(), text: "", pitch: "normal", speed: "normal" }] })
+        onChange({ sentences: [...sentences, { id: crypto.randomUUID(), text: "", speed: "1.0", pitch: "1.0" }] })
     }
     const handleRemoveSentence = (id: string) => {
         onChange({ sentences: sentences.filter(s => s.id !== id) })
@@ -155,9 +155,9 @@ export default function VoiceBlock({ voice, sentences, synthesisError, onChange,
                     onChange={val => handleSentenceChange(s.id, { text: val })}
                     onGenerate={() => onGenerate(s.id, s.text)}
                     onDelete={() => handleRemoveSentence(s.id)}
-                    pitch={s.pitch || "normal"}
+                    pitch={s.pitch || "1.0"}
                     onPitchChange={val => handleSentenceChange(s.id, { pitch: val })}
-                    speed={s.speed || "normal"}
+                    speed={s.speed || "1.0"}
                     onSpeedChange={val => handleSentenceChange(s.id, { speed: val })}
                     loading={s.loading}
                     isPlaying={currentPlayingSentenceId === s.id}

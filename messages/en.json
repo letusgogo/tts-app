@@ -92,16 +92,10 @@
         "generate": "Generate Audio",
         "generating": "Generating...",
         "pitch": {
-            "label": "Pitch",
-            "low": "Low",
-            "normal": "Normal",
-            "high": "High"
+            "label": "Pitch"
         },
         "speed": {
-            "label": "Speed",
-            "slow": "Slow",
-            "normal": "Normal",
-            "fast": "Fast"
+            "label": "Speed"
         },
         "delete": "Delete"
     }

@@ -29,7 +29,7 @@ export default function VoiceManage() {
             id: crypto.randomUUID(),
             voice: "BV138_streaming",
             sentences: [
-                { id: crypto.randomUUID(), text: "What's the purpose of this project? What does it do?", pitch: "normal", speed: "normal" },
+                { id: crypto.randomUUID(), text: "What's the purpose of this project? What does it do?", pitch: "1.0", speed: "1.0" },
             ]
         },
         {
@@ -37,21 +37,21 @@ export default function VoiceManage() {
             voice: "BV027_streaming",
             sentences: [
                 { id: crypto.randomUUID(), text: "EchoLearner is built for language learners like you. You can pick a voice, type in any text, and instantly turn it into speech. ", pitch: "normal", speed: "normal" },
-                { id: crypto.randomUUID(), text: "It's a great way to create your own listening materials.", pitch: "normal", speed: "normal" }
+                { id: crypto.randomUUID(), text: "It's a great way to create your own listening materials.", pitch: "1.0", speed: "1.0" }
             ],
         },
         {
             id: crypto.randomUUID(),
             voice: "BV138_streaming",
             sentences: [
-                { id: crypto.randomUUID(), text: "uh...  So, you mean, I can use it to practice English listening? ", pitch: "normal", speed: "normal" },
+                { id: crypto.randomUUID(), text: "uh...  So, you mean, I can use it to practice English listening? ", pitch: "1.0", speed: "1.0" },
             ]
         },
         {
             id: crypto.randomUUID(),
             voice: "BV027_streaming",
             sentences: [
-                { id: crypto.randomUUID(), text: "Absolutely. You can adjust the speed, pitch, and voice style — perfect for training your ears, preparing dialogues, or even building your own study content.", pitch: "normal", speed: "normal" },
+                { id: crypto.randomUUID(), text: "Absolutely. You can adjust the speed, pitch, and voice style — perfect for training your ears, preparing dialogues, or even building your own study content.", pitch: "1.0", speed: "1.0" },
             ],
         },
     ]);
@@ -132,7 +132,7 @@ export default function VoiceManage() {
                 id: crypto.randomUUID(),
                 voice: "BV511_streaming",
                 sentences: [
-                    { id: crypto.randomUUID(), text: "", pitch: "normal", speed: "normal" }
+                    { id: crypto.randomUUID(), text: "", pitch: "1.0", speed: "1.0" }
                 ]
             });
         });
@@ -178,7 +178,12 @@ export default function VoiceManage() {
                                 const res = await fetch("/api/tts", {
                                     method: "POST",
                                     headers: { "Content-Type": "application/json" },
-                                    body: JSON.stringify({ text: sentence.text, voice: block.voice }),
+                                    body: JSON.stringify({
+                                        text: sentence.text,
+                                        voice: block.voice,
+                                        pitch: sentence.pitch,
+                                        speed: sentence.speed
+                                    }),
                                 });
 
                                 if (!res.ok) {

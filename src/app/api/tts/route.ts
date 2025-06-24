@@ -16,7 +16,7 @@ export async function POST(request: Request) {
     }
 
     // 解析请求体
-    const { text, voice } = await request.json();
+    const { text, voice, pitch, speed } = await request.json();
 
     // 火山引擎参数
     const APPID = process.env.VOLC_TTS_APPID!;
@@ -40,9 +40,9 @@ export async function POST(request: Request) {
             encoding: "mp3",
             rate: 24000,
             compression_rate: 1,
-            speed_ratio: 1.0,
+            speed_ratio: speed,
             volume_ratio: 1.0,
-            pitch_ratio: 1.0,
+            pitch_ratio: pitch,
             emotion: "neutral",
         },
         request: {

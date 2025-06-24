@@ -24,6 +24,8 @@ function FunctionArea({
   keepOpen,
 }: FunctionAreaProps) {
   const t = useTranslations('SentenceBlock')
+  const pitchOptions = Array.from({ length: 20 }, (_, i) => ((i + 1) * 0.1).toFixed(1));
+  const speedOptions = Array.from({ length: 20 }, (_, i) => ((i + 1) * 0.1).toFixed(1));
 
   return (
     <div
@@ -33,20 +35,22 @@ function FunctionArea({
         keepOpen();
       }}
     >
+      <span>{t('pitch.label')}</span>
       <Select value={pitch} onValueChange={onPitchChange} onOpenChange={() => setTimeout(() => keepOpen(), 0)}>
-        <SelectTrigger className="w-20"><SelectValue placeholder={t('pitch.label')} /></SelectTrigger>
+        <SelectTrigger className="w-20"><SelectValue /></SelectTrigger>
         <SelectContent>
-          <SelectItem value="low">{t('pitch.low')}</SelectItem>
-          <SelectItem value="normal">{t('pitch.normal')}</SelectItem>
-          <SelectItem value="high">{t('pitch.high')}</SelectItem>
+          {pitchOptions.map((v) => (
+            <SelectItem key={v} value={v}>{v}</SelectItem>
+          ))}
         </SelectContent>
       </Select>
+      <span>{t('speed.label')}</span>
       <Select value={speed} onValueChange={onSpeedChange} onOpenChange={() => setTimeout(() => keepOpen(), 0)}>
-        <SelectTrigger className="w-20"><SelectValue placeholder={t('speed.label')} /></SelectTrigger>
+        <SelectTrigger className="w-20"><SelectValue /></SelectTrigger>
         <SelectContent>
-          <SelectItem value="slow">{t('speed.slow')}</SelectItem>
-          <SelectItem value="normal">{t('speed.normal')}</SelectItem>
-          <SelectItem value="fast">{t('speed.fast')}</SelectItem>
+          {speedOptions.map((v) => (
+            <SelectItem key={v} value={v}>{v}</SelectItem>
+          ))}
         </SelectContent>
       </Select>
     </div>

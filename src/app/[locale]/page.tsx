@@ -11,7 +11,7 @@ export default function Home() {
   const translation = useTranslations();
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-8 relative">
+    <div className="min-h-screen flex flex-col bg-gray-100">
       {/* 登录按钮区域 */}
       <div className="absolute top-4 right-8 z-50">
         {session ? (
@@ -23,7 +23,13 @@ export default function Home() {
           <button className="px-3 py-1 bg-blue-600 text-white rounded" onClick={() => signIn("casdoor")}>{translation('login')}</button>
         )}
       </div>
-      <VoiceManage />
+      <main className="flex-1 flex items-center justify-center p-8">
+        <VoiceManage />
+      </main>
+      <footer className="w-full text-center text-gray-500 text-sm py-4 mt-auto bg-white shadow">
+        Contact: <a href="mailto:helloworldyong9@gmail.com" className="underline">helloworldyong9@gmail.com</a> |
+        YouTube: <a href="https://www.youtube.com/channel/UC0lN46cAiu41Hwn0SOZCRiw" target="_blank" rel="noopener noreferrer" className="underline">Build With Yang</a>
+      </footer>
     </div>
   )
 }

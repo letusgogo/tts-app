@@ -92,16 +92,10 @@
         "generate": "生成语音",
         "generating": "生成中...",
         "pitch": {
-            "label": "语调",
-            "low": "低",
-            "normal": "正常",
-            "high": "高"
+            "label": "语调"
         },
         "speed": {
-            "label": "语速",
-            "slow": "慢",
-            "normal": "正常",
-            "fast": "快"
+            "label": "语速"
         },
         "delete": "删除"
     }

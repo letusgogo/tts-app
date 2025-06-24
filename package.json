@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "docker:build": "docker build --platform linux/amd64 -t registry.cn-hangzhou.aliyuncs.com/helloworldyu/tts-app:latest .",
+    "docker:push": "docker push registry.cn-hangzhou.aliyuncs.com/helloworldyu/tts-app:latest",
     "docker:run": "docker run -p 2025:2025 tts-app"
   },
   "dependencies": {
