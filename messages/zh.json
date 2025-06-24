@@ -8,9 +8,17 @@
     "generate_audio": "生成语音",
     "pitch": "语调",
     "speed": "语速",
+    "merging_audio": "正在合并音频...",
+    "merge_audio": "合并音频",
+    "merge_error": "合并错误",
+    "merge_success": "合并成功!",
+    "audio_not_supported": "您的浏览器不支持音频播放",
     "VoiceBlock": {
         "role": "角色",
         "selectVoice": "选择声音",
+        "synthesizing": "正在合成音频...",
+        "synthesis_error": "合成错误",
+        "synthesis_success": "合成成功!",
         "voiceGroups": {
             "en-US": {
                 "name": "美式英语",

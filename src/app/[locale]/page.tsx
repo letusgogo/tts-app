@@ -120,7 +120,7 @@ export default function Home() {
         )}
       </div>
       <div className="space-y-6 w-full max-w-2xl bg-white p-6 rounded shadow">
-        <h1 className="text-2xl font-bold text-center">(TTS)</h1>
+        <h1 className="text-2xl font-bold text-center">{translation('tts_title')}</h1>
         {/* 语音块列表 */}
         {blocks.map((block) => (
           <div className="relative" key={block.id}>
@@ -149,24 +149,24 @@ export default function Home() {
             disabled={isMerging || blocks.length === 0}
             className="bg-green-600 hover:bg-green-700"
           >
-            {isMerging ? "正在合并音频..." : "合并音频"}
+            {isMerging ? translation('merging_audio') : translation('merge_audio')}
           </Button>
         </div>
 
         {/* Error Display */}
         {mergeError && (
           <div className="text-red-600 text-center p-4 bg-red-50 rounded">
-            合并错误: {mergeError}
+            {translation('merge_error')}: {mergeError}
           </div>
         )}
 
         {/* Final Merged Audio Display */}
         {mergedAudioUrl && (
           <div className="text-center p-4 bg-green-50 rounded">
-            <h3 className="text-lg font-semibold text-green-800 mb-2">合并成功!</h3>
+            <h3 className="text-lg font-semibold text-green-800 mb-2">{translation('merge_success')}</h3>
             <audio controls className="w-full">
               <source src={mergedAudioUrl} type="audio/mp3" />
-              您的浏览器不支持音频播放
+              {translation('audio_not_supported')}
             </audio>
           </div>
         )}

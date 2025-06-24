@@ -8,9 +8,17 @@
     "generate_audio": "Generate Audio",
     "pitch": "Pitch",
     "speed": "Speed",
+    "merging_audio": "Merging audio...",
+    "merge_audio": "Merge Audio",
+    "merge_error": "Merge Error",
+    "merge_success": "Merge Success!",
+    "audio_not_supported": "Your browser does not support audio playback",
     "VoiceBlock": {
         "role": "Role",
         "selectVoice": "Select Voice",
+        "synthesizing": "Synthesizing audio...",
+        "synthesis_error": "Synthesis Error",
+        "synthesis_success": "Synthesis Success!",
         "voiceGroups": {
             "en-US": {
                 "name": "American English",
