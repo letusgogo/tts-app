@@ -64,18 +64,19 @@ interface Props {
   speed: string;
   onSpeedChange: (val: string) => void;
   loading?: boolean;
+  isPlaying?: boolean;
   onKeyDown?: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
   onSynthesisRequest?: () => Promise<void>;
 }
 
 export default function SentenceBlock({
   value, onChange, onGenerate, onDelete,
-  pitch, onPitchChange, speed, onSpeedChange, loading, onKeyDown, audioUrl }: Props) {
+  pitch, onPitchChange, speed, onSpeedChange, loading, isPlaying, onKeyDown, audioUrl }: Props) {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const audioRef = useRef<HTMLAudioElement>(null)
   const [showFunctions, setShowFunctions] = useState(false)
-  const [isPlaying, setIsPlaying] = useState(false)
   const hideTimer = useRef<NodeJS.Timeout | null>(null)
+  const [isPlayingLocal, setIsPlayingLocal] = useState(false)
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -101,14 +102,12 @@ export default function SentenceBlock({
     if (!audioUrl) {
       onGenerate()
     } else if (audioRef.current) {
+      setIsPlayingLocal(true)
       audioRef.current.currentTime = 0
       audioRef.current.play()
-      setIsPlaying(true)
+      audioRef.current.onended = () => setIsPlayingLocal(false)
+      audioRef.current.onerror = () => setIsPlayingLocal(false)
     }
-  }
-
-  const handleAudioEnded = () => {
-    setIsPlaying(false)
   }
 
   return (
@@ -132,7 +131,7 @@ export default function SentenceBlock({
             disabled={loading}
             className="w-9 h-9 rounded-full bg-transparent shadow-none border-none flex items-center justify-center hover:bg-gray-100"
           >
-            {(loading || isPlaying) ? (
+            {(loading || isPlayingLocal || isPlaying) ? (
               <Play rotate className="text-black" />
             ) : (
               <Play className="text-black" />
@@ -160,7 +159,7 @@ export default function SentenceBlock({
         </div>
       )}
       {audioUrl && (
-        <audio ref={audioRef} src={audioUrl} style={{ display: 'none' }} onEnded={handleAudioEnded} />
+        <audio ref={audioRef} src={audioUrl} style={{ display: 'none' }} />
       )}
     </div>
   )

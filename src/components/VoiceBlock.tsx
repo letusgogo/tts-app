@@ -1,298 +1,184 @@
 "use client"
 
-import { useImperativeHandle, Ref } from "react"
-import { useImmerReducer } from "use-immer"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 import SentenceBlock from "./SentenceBlock"
 import { useTranslations } from 'next-intl'
-import { signIn } from "next-auth/react"
+import React, { useState, useRef } from "react"
+import { Button } from "@/components/ui/button"
+import { Play } from "@/components/ui/Play"
+import { X } from "lucide-react"
 
-export type Props = {
-    voice: string
-    ref?: Ref<VoiceBlockRef>
-}
-
-export type VoiceBlockRef = {
-    synthesize: () => Promise<string>
-}
-
-type Sentence = {
+export type Sentence = {
     id: string
     text: string
+    pitch: string
+    speed: string
     audioUrl?: string
     loading?: boolean
     error?: string
-    pitch?: string
-    speed?: string
 }
 
-type State = {
-    role: string
+export type VoiceBlockProps = {
+    voice: string
     sentences: Sentence[]
-    synthesizing?: boolean
     synthesisError?: string
-    synthesisUrl?: string
+    onChange: (data: Partial<{
+        voice: string
+        sentences: Sentence[]
+        synthesisError?: string
+    }>) => void
+    onGenerate: (sentenceId: string, text: string) => void
+    onBlockGenerate: () => void
+    onDeleteBlock?: () => void
 }
 
-type Action =
-    | { type: "SET_ROLE"; payload: string }
-    | { type: "ADD_SENTENCE" }
-    | { type: "REMOVE_SENTENCE"; payload: string }
-    | { type: "SET_SENTENCE_LOADING"; id: string; loading: boolean }
-    | { type: "SET_SENTENCE_AUDIO"; id: string; audioUrl: string }
-    | { type: "SET_SENTENCE_ERROR"; id: string; error: string }
-    | { type: "SET_SENTENCE_TEXT"; id: string; text: string }
-    | { type: "SET_SENTENCE_PITCH"; id: string; pitch: string }
-    | { type: "SET_SENTENCE_SPEED"; id: string; speed: string }
-    | { type: "INSERT_SENTENCE_AFTER"; id: string }
-    | { type: "SET_SYNTHESIZING"; payload: boolean }
-    | { type: "SET_SYNTHESIS_ERROR"; payload: string }
-    | { type: "SET_SYNTHESIS_URL"; payload: string }
-
-type VoiceGroup = {
-    name: string
-    englishName: string
-    voices: {
-        [key: string]: {
-            name: string
-            description: string
-        }
-    }
-}
-
-const initialState = (voice: string): State => ({
-    role: voice,
-    sentences: [
-        {
-            id: crypto.randomUUID(),
-            text: "ssss",
-            pitch: "normal",
-            speed: "normal"
-        },
-        {
-            id: crypto.randomUUID(),
-            text: "",
-            pitch: "normal",
-            speed: "normal"
-        }
-    ],
-})
-
-function reducer(draft: State, action: Action): void {
-    switch (action.type) {
-        case "SET_ROLE":
-            draft.role = action.payload
-            break
-        case "ADD_SENTENCE":
-            draft.sentences.push({ id: crypto.randomUUID(), text: "", pitch: "normal", speed: "normal" })
-            break
-        case "REMOVE_SENTENCE":
-            draft.sentences = draft.sentences.filter(s => s.id !== action.payload)
-            break
-        case "SET_SENTENCE_LOADING": {
-            const s = draft.sentences.find(s => s.id === action.id)
-            if (s) s.loading = action.loading
-            break
-        }
-        case "SET_SENTENCE_AUDIO": {
-            const s = draft.sentences.find(s => s.id === action.id)
-            if (s) {
-                s.audioUrl = action.audioUrl
-                s.loading = false
-                s.error = undefined
-            }
-            break
-        }
-        case "SET_SENTENCE_ERROR": {
-            const s = draft.sentences.find(s => s.id === action.id)
-            if (s) {
-                s.error = action.error
-                s.loading = false
-            }
-            break
-        }
-        case "SET_SENTENCE_TEXT": {
-            const s = draft.sentences.find(s => s.id === action.id)
-            if (s) s.text = action.text
-            break
-        }
-        case "SET_SENTENCE_PITCH": {
-            const s = draft.sentences.find(s => s.id === action.id)
-            if (s) s.pitch = action.pitch
-            break
-        }
-        case "SET_SENTENCE_SPEED": {
-            const s = draft.sentences.find(s => s.id === action.id)
-            if (s) s.speed = action.speed
-            break
-        }
-        case "INSERT_SENTENCE_AFTER": {
-            const idx = draft.sentences.findIndex(s => s.id === action.id)
-            if (idx !== -1) {
-                draft.sentences.splice(idx + 1, 0, { id: crypto.randomUUID(), text: "", pitch: "normal", speed: "normal" })
-            }
-            break
-        }
-        case "SET_SYNTHESIZING":
-            draft.synthesizing = action.payload
-            if (action.payload) {
-                draft.synthesisError = undefined
-                draft.synthesisUrl = undefined
-            }
-            break
-        case "SET_SYNTHESIS_ERROR":
-            draft.synthesisError = action.payload
-            draft.synthesizing = false
-            break
-        case "SET_SYNTHESIS_URL":
-            draft.synthesisUrl = action.payload
-            draft.synthesizing = false
-            draft.synthesisError = undefined
-            break
-    }
-}
-
-export default function VoiceBlock({ voice, ref }: Props) {
-    const [state, dispatch] = useImmerReducer(reducer, initialState(voice))
+export default function VoiceBlock({ voice, sentences, synthesisError, onChange, onGenerate, onBlockGenerate, onDeleteBlock }: VoiceBlockProps) {
     const translation = useTranslations('VoiceBlock')
+    const [isBlockGenerating, setIsBlockGenerating] = useState(false)
+    const [isBlockPlaying, setIsBlockPlaying] = useState(false)
+    const [currentPlayingSentenceId, setCurrentPlayingSentenceId] = useState<string | null>(null)
+    const audioRefs = useRef<{ [key: string]: HTMLAudioElement | null }>({})
 
-    async function handleGenerate(sid: string, text: string) {
-        dispatch({ type: "SET_SENTENCE_LOADING", id: sid, loading: true })
-        try {
-            if (text.trim() === "") {
-                dispatch({ type: "SET_SENTENCE_ERROR", id: sid, error: "text is empty" })
-                return
-            }
-
-            const res = await fetch("/api/tts", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ text, voice: state.role }),
-            })
-
-            if (!res.ok) {
-                const errorData = await res.json().catch(() => ({}))
-                if (res.status === 401) {
-                    signIn("casdoor")
-                }
-                throw new Error(errorData.error || `生成失败 (${res.status})`)
-            }
-
-            const data = await res.json()
-            dispatch({ type: "SET_SENTENCE_AUDIO", id: sid, audioUrl: data.audioUrl })
-            return data.audioUrl
-        } catch (e: unknown) {
-            const errorMessage = e instanceof Error ? e.message : "生成失败"
-            dispatch({ type: "SET_SENTENCE_ERROR", id: sid, error: errorMessage })
-            throw e
-        }
+    // 角色切换
+    const handleRoleChange = (v: string) => {
+        onChange({
+            voice: v,
+            sentences: sentences.map(s => ({
+                ...s,
+                audioUrl: undefined
+            }))
+        });
     }
 
-    // Expose synthesize method via ref
-    useImperativeHandle(ref, () => ({
-        synthesize: async (): Promise<string> => {
-            // Set synthesizing state
-            dispatch({ type: "SET_SYNTHESIZING", payload: true })
+    // 句子相关操作
+    const handleSentenceChange = (id: string, data: Partial<Sentence>) => {
+        onChange({
+            sentences: sentences.map(s =>
+                s.id === id
+                    ? {
+                        ...s,
+                        ...data,
+                        audioUrl: data.text !== undefined && data.text !== s.text ? undefined : s.audioUrl
+                    }
+                    : s
+            )
+        });
+    }
+    const handleAddSentence = () => {
+        onChange({ sentences: [...sentences, { id: crypto.randomUUID(), text: "", pitch: "normal", speed: "normal" }] })
+    }
+    const handleRemoveSentence = (id: string) => {
+        onChange({ sentences: sentences.filter(s => s.id !== id) })
+    }
 
+    // Block 批量生成/播放逻辑
+    const handleBlockPlayClick = async () => {
+        const allHaveAudio = sentences.every(s => s.audioUrl);
+        if (!allHaveAudio) {
+            // 没有音频，批量生成
+            setIsBlockGenerating(true);
             try {
-                // Filter out empty sentences
-                const validSentences = state.sentences.filter((s: Sentence) => s.text.trim() !== "")
-
-                if (validSentences.length === 0) {
-                    throw new Error("No valid sentences to synthesize")
-                }
-
-                // Generate audio for all sentences that don't have audio yet
-                const audioPromises = validSentences.map(async (sentence: Sentence) => {
+                await onBlockGenerate();
+            } finally {
+                setIsBlockGenerating(false);
+            }
+        } else {
+            // 有音频，依次播放
+            setIsBlockPlaying(true);
+            try {
+                for (const sentence of sentences) {
                     if (sentence.audioUrl) {
-                        // Extract base64 from data URL
-                        const base64 = sentence.audioUrl.split(',')[1]
-                        return { base64 }
-                    } else {
-                        // Reuse handleGenerate logic
-                        const audioUrl = await handleGenerate(sentence.id, sentence.text)
-                        const base64 = audioUrl.split(',')[1]
-                        return { base64 }
+                        setCurrentPlayingSentenceId(sentence.id);
+                        const audio = audioRefs.current[sentence.id];
+                        if (audio) {
+                            audio.currentTime = 0;
+                            await new Promise<void>((resolve, reject) => {
+                                audio.onended = () => resolve();
+                                audio.onerror = () => reject(new Error('播放失败'));
+                                audio.play().catch(reject);
+                            });
+                        }
                     }
-                })
-
-                const audioDatas = await Promise.all(audioPromises)
-
-                // Merge all audio files
-                const mergeRes = await fetch("/api/synthesize", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ audioDatas }),
-                })
-
-                if (!mergeRes.ok) {
-                    const errorData = await mergeRes.json().catch(() => ({}))
-                    if (mergeRes.status === 401) {
-                        signIn("casdoor")
-                    }
-                    throw new Error(errorData.error || `${translation('synthesis_error')} (${mergeRes.status})`)
                 }
-
-                const mergeData = await mergeRes.json()
-                const synthesisUrl = mergeData.synthesisUrl
-
-                // Update state with synthesis result
-                dispatch({ type: "SET_SYNTHESIS_URL", payload: synthesisUrl })
-
-                return synthesisUrl
             } catch (error) {
-                const errorMessage = error instanceof Error ? error.message : translation('synthesis_error')
-                dispatch({ type: "SET_SYNTHESIS_ERROR", payload: errorMessage })
-                throw error
+                console.error('播放音频失败:', error);
+            } finally {
+                setIsBlockPlaying(false);
+                setCurrentPlayingSentenceId(null);
             }
         }
-    }), [state.sentences, state.role])
+    }
 
     return (
-        <div className="border rounded p-4 bg-gray-50 space-y-3">
+        <div className="border rounded p-4 bg-gray-50 space-y-3 relative">
+            <div className="absolute top-2 right-2 flex gap-2">
+                <Button size="icon" variant="ghost" onClick={handleBlockPlayClick} disabled={isBlockGenerating || isBlockPlaying}>
+                    <Play rotate={isBlockGenerating || isBlockPlaying} className="w-5 h-5" />
+                </Button>
+                {onDeleteBlock && (
+                    <Button
+                        size="icon"
+                        variant="ghost" onClick={onDeleteBlock}>
+                        <X className="w-5 h-5 text-red-500" />
+                    </Button>
+                )}
+            </div>
             <div className="flex items-center gap-2">
                 <span className="font-semibold">{translation('role')}:</span>
-                <Select value={state.role} onValueChange={(v) => dispatch({ type: "SET_ROLE", payload: v })}>
+                <Select value={voice} onValueChange={handleRoleChange}>
                     <SelectTrigger className="w-32">
                         <SelectValue placeholder={translation('selectVoice')} />
                     </SelectTrigger>
                     <SelectContent>
                         {Object.entries(translation.raw('voiceGroups')).map(([, group]) => (
-                            Object.entries((group as VoiceGroup).voices).map(([voiceId, voice]) => (
-                                <SelectItem key={voiceId} value={voiceId}>
-                                    {voice.name}{voice.description ? ` - ${voice.description}` : ''}
-                                </SelectItem>
-                            ))
+                            Object.entries((group as { voices: Record<string, { name: string; description?: string }> }).voices)
+                                .map(([voiceId, v]: [string, { name: string; description?: string }]) => (
+                                    <SelectItem key={voiceId} value={voiceId}>
+                                        {v.name}{v.description ? ` - ${v.description}` : ''}
+                                    </SelectItem>
+                                ))
                         ))}
                     </SelectContent>
                 </Select>
             </div>
 
-            {state.synthesisError && (
-                <div className="text-red-600">{translation('synthesis_error')}: {state.synthesisError}</div>
+            {synthesisError && (
+                <div className="text-red-600">{translation('synthesis_error')}: {synthesisError}</div>
             )}
 
             {/* 句子列表 */}
-            {state.sentences.map((s: Sentence) => (
+            {sentences.map((s) => (
                 <SentenceBlock
                     key={s.id}
                     value={s.text}
                     audioUrl={s.audioUrl}
-                    onChange={val => dispatch({ type: "SET_SENTENCE_TEXT", id: s.id, text: val })}
-                    onGenerate={() => handleGenerate(s.id, s.text)}
-                    onDelete={() => dispatch({ type: "REMOVE_SENTENCE", payload: s.id })}
+                    onChange={val => handleSentenceChange(s.id, { text: val })}
+                    onGenerate={() => onGenerate(s.id, s.text)}
+                    onDelete={() => handleRemoveSentence(s.id)}
                     pitch={s.pitch || "normal"}
-                    onPitchChange={val => dispatch({ type: "SET_SENTENCE_PITCH", id: s.id, pitch: val })}
+                    onPitchChange={val => handleSentenceChange(s.id, { pitch: val })}
                     speed={s.speed || "normal"}
-                    onSpeedChange={val => dispatch({ type: "SET_SENTENCE_SPEED", id: s.id, speed: val })}
+                    onSpeedChange={val => handleSentenceChange(s.id, { speed: val })}
                     loading={s.loading}
+                    isPlaying={currentPlayingSentenceId === s.id}
                     onKeyDown={e => {
                         if (e.key === "Enter" && !e.shiftKey) {
                             e.preventDefault();
-                            dispatch({ type: "INSERT_SENTENCE_AFTER", id: s.id });
+                            handleAddSentence();
                         }
                     }}
                 />
+            ))}
+            {/* 隐藏的音频元素，用于播放 */}
+            {sentences.map((s) => (
+                s.audioUrl && (
+                    <audio
+                        key={s.id}
+                        ref={(el) => { audioRefs.current[s.id] = el; }}
+                        src={s.audioUrl}
+                        style={{ display: 'none' }}
+                    />
+                )
             ))}
         </div>
     )
