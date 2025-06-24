@@ -7,6 +7,7 @@ import React, { useState, useRef } from "react"
 import { useImmerReducer } from "use-immer"
 import { useSession, signIn, signOut } from "next-auth/react"
 import { useTranslations } from 'next-intl';
+import { Trash2, PlusCircle, PlayCircle } from "lucide-react"
 
 type VoiceBlockData = { id: string; voice: string }
 type Action =
@@ -35,7 +36,7 @@ function reducer(draft: VoiceBlockData[], action: Action): VoiceBlockData[] | vo
 
 export default function Home() {
   const { data: session } = useSession()
-  const [blocks, dispatch] = useImmerReducer(reducer, [voiceBlockInitial()])
+  const [blocks, dispatch] = useImmerReducer(reducer, [voiceBlockInitial(), voiceBlockInitial()])
   const translation = useTranslations();
   const [isMerging, setIsMerging] = useState(false)
   const [mergedAudioUrl, setMergedAudioUrl] = useState<string | null>(null)
@@ -133,22 +134,31 @@ export default function Home() {
             />
             <div className="absolute top-2 right-2">
               <Button size="sm" variant="destructive" onClick={() => dispatch({ type: "REMOVE_BLOCK", id: block.id })}>
-                {translation('delete')}
+                <Trash2 className="w-4 h-4" />
               </Button>
             </div>
           </div>
         ))}
         <div className="flex justify-center">
-          <Button onClick={() => dispatch({ type: "ADD_BLOCK" })}>{translation('add_voice_block')}</Button>
+          <Button
+            onClick={() => dispatch({ type: "ADD_BLOCK" })}
+            className="flex items-center gap-2 px-6 py-3 rounded-full border-2 border-gray-300 bg-transparent text-gray-500 font-bold uppercase text-lg shadow-none hover:bg-gray-100 min-w-[220px]"
+            variant="ghost"
+          >
+            <PlusCircle className="w-6 h-6" />
+            {translation('add_voice_block')}
+          </Button>
         </div>
 
         {/* Merge Audio Button */}
-        <div className="flex justify-center">
+        <div className="flex justify-center mt-4">
           <Button
             onClick={handleMergeAudio}
             disabled={isMerging || blocks.length === 0}
-            className="bg-green-600 hover:bg-green-700"
+            className="flex items-center gap-2 px-6 py-3 rounded-full border-2 border-gray-300 bg-transparent text-gray-500 font-bold uppercase text-lg shadow-none hover:bg-gray-100 min-w-[220px]"
+            variant="ghost"
           >
+            <PlayCircle className="w-6 h-6" />
             {isMerging ? translation('merging_audio') : translation('merge_audio')}
           </Button>
         </div>

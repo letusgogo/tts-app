@@ -65,6 +65,12 @@ const initialState = (voice: string): State => ({
     sentences: [
         {
             id: crypto.randomUUID(),
+            text: "ssss",
+            pitch: "normal",
+            speed: "normal"
+        },
+        {
+            id: crypto.randomUUID(),
             text: "",
             pitch: "normal",
             speed: "normal"
